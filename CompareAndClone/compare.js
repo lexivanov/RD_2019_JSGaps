@@ -21,8 +21,8 @@ function deepEqual(a, b) {
     return propertiesInA == propertiesInB;
 }
 
-function deepEqualFull() {
-    let i, l, leftChain, rightChain;
+function deepEqualFull(...objects) {
+    let i, leftChain, rightChain;
 
     function compare2Objects(x, y) {
         let prop;
@@ -31,15 +31,16 @@ function deepEqualFull() {
             return true;
         }
 
+        // NaN === NaN
         if (isNaN(x) && isNaN(y) && typeof x === 'number' && typeof y === 'number') {
             return true;
         }
 
         if ((typeof x === 'function' && typeof y === 'function') ||
-            (x instanceof Date && y instanceof Date) ||
-            (x instanceof RegExp && y instanceof RegExp) ||
-            (x instanceof String && y instanceof String) ||
-            (x instanceof Number && y instanceof Number)) {
+            (x instanceof Date       && y instanceof Date      ) ||
+            (x instanceof RegExp     && y instanceof RegExp    ) ||
+            (x instanceof String     && y instanceof String    ) ||
+            (x instanceof Number     && y instanceof Number    )) {
             return x.toString() === y.toString();
         }
 
@@ -47,6 +48,7 @@ function deepEqualFull() {
             return false;
         }
 
+        // Сравнение прототипов
         if (x.isPrototypeOf(y) || y.isPrototypeOf(x)) {
             return false;
         }
@@ -59,10 +61,12 @@ function deepEqualFull() {
             return false;
         }
 
+        // Проверка бесконечной вложенности
         if (leftChain.includes(x) || rightChain.includes(y)) {
             return false;
         }
 
+        // Проверка соответствия типов свойств y типам одноименных свойств x
         for (prop in y) {
             if (y.hasOwnProperty(prop) !== x.hasOwnProperty(prop)) {
                 return false;
@@ -71,6 +75,7 @@ function deepEqualFull() {
             }
         }
 
+        // Проверка соответствия типов свойств x типам одноименных свойств y и если тип совпадает сравнение уже этих свойств
         for (prop in x) {
             if (y.hasOwnProperty(prop) !== x.hasOwnProperty(prop)) {
                 return false;
@@ -82,6 +87,7 @@ function deepEqualFull() {
                 case 'object':
                 case 'function':
 
+                    // Добавление объекта в цепочку чтобы выявить циклические зависимости
                     leftChain.push(x);
                     rightChain.push(y);
 
@@ -104,16 +110,16 @@ function deepEqualFull() {
         return true;
     }
 
-    if (arguments.length < 1) {
+    if (objects.length < 1) {
         return true;
     }
 
-    for (i = 1, l = arguments.length; i < l; i++) {
+    for (i = 1; i < objects.length; i++) {
 
         leftChain = []
         rightChain = [];
 
-        if (!compare2Objects(arguments[0], arguments[i])) {
+        if (!compare2Objects(objects[0], objects[i])) {
             return false;
         }
     }

@@ -1,13 +1,16 @@
 function shortDeepClone(obj) {
     let recipient = obj;
-    let i;
-    if (recipient && typeof obj == "object") {
+
+    if (recipient && typeof obj === "object") {
         recipient = obj instanceof Array ? [] : {};
-        for (i in obj)
-            if (obj.hasOwnProperty(i))
-                recipient[i] = dup(obj[i]);
+        for (let i in obj) {
+            if (obj.hasOwnProperty(i)){
+                recipient[i] = shortDeepClone(obj[i]);
+            }
+        }
     }
-    return recipient
+
+    return recipient;
 }
 
 // Версия которую можно твитнуть :D
